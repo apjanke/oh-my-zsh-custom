@@ -18,5 +18,8 @@ No support of any kind is provided for this code.
 
 ## Author
 
-Andrew Janke <janke@pobox.com>
+Andrew Janke
+
+janke@pobox.com
+
 https://github.com/apjanke
