@@ -15,3 +15,8 @@ By convention, I clone this locally to `~/.oh-my-zsh-custom`, but any location w
 This is hosted on GitHub so other people working on oh-my-zsh can look at it when testing code, and so I can easily sync it to multiple machines of mine. This is not intended to provide significant functionality or reusable code of value. You probably do not want to use this as your own OMZ custom dir unless you're working an OMZ issue with me.
 
 No support of any kind is provided for this code.
+
+## Author
+
+Andrew Janke <janke@pobox.com>
+https://github.com/apjanke
