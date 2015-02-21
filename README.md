@@ -1,6 +1,6 @@
 # oh-my-zsh-custom
 
-These are Andrew Janke's customizations to go with oh-my-zsh ("OMZ"). 
+These are Andrew Janke's customizations to go with [oh-my-zsh ("OMZ")](https://github.com/robbyrussell/oh-my-zsh). 
 
 This may include:
 
