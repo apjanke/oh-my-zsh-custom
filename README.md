@@ -8,9 +8,11 @@ This may include:
 * OMZ functionality that's in pending pull requests but I want now
 * Alternate versions of things for testing
 
+## Usage
+
 By convention, I clone this locally to `~/.oh-my-zsh-custom`, but any location will work. `$ZSH_CUSTOM` must be pointed at this in `~/.zshrc` before initializing OMZ.
 
-## Usage
+If you're using Atlassian SourceTree, that won't work. It doesn't seem to like repo dirs starting with a dot. In that case, I just clone it somewhere else and symlink `~/.oh-my-zsh-custom` to it.
 
 This is hosted on GitHub so other people working on oh-my-zsh can look at it when testing code, and so I can easily sync it to multiple machines of mine. This is not intended to provide significant functionality or reusable code of value. You probably do not want to use this as your own OMZ custom dir unless you're working an OMZ issue with me.
 
