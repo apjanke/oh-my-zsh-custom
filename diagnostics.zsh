@@ -30,8 +30,7 @@ function _omz_diagnostic_dump () {
   done
   echo Versions:
   echo "git: $(git --version)"
-  whence bash &>/dev/null && echo "bash: $(bash --version | grep -v Copyright)"
-  whence sh &>/dev/null && echo "sh: $(sh --version | grep -v Copyright)"
+  whence bash &>/dev/null && echo "bash: $(bash --version | grep ersi)"
   echo
 
   # Process state
