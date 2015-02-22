@@ -12,6 +12,9 @@
 # The output is human-readable and its format may change over time. It is not
 # suitable for parsing.
 #
+# This is intended to be widely portable, and run anywhere that oh-my-zsh does.
+# Feel free to report any portability issues as bugs.
+#
 # TODO:
 # * Add option parsing
 # * Add optional key binding dump
