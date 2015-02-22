@@ -35,7 +35,7 @@ function _omz_diagnostic_dump () {
   done
   echo Versions:
   echo "git: $(git --version)"
-  whence bash &>/dev/null && echo "bash: $(bash --version | grep ersi)"
+  whence bash &>/dev/null && echo "bash: $(bash --version | grep bash)"
   echo
 
   # Process state
