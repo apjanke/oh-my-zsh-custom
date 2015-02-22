@@ -11,6 +11,11 @@
 #
 # The output is human-readable and its format may change over time. It is not
 # suitable for parsing.
+#
+# TODO:
+# * Add option parsing
+# * Add optional key binding dump
+# * Add automatic gist creation
 function _omz_diagnostic_dump () {
   emulate -L zsh
   local programs program 
@@ -31,7 +36,6 @@ function _omz_diagnostic_dump () {
   echo Versions:
   echo "git: $(git --version)"
   whence bash &>/dev/null && echo "bash: $(bash --version | grep -v Copyright)"
-  whence sh &>/dev/null && echo "sh: $(sh --version | grep -v Copyright)"
   echo
 
   # Process state
