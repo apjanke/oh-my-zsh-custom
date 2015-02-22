@@ -49,7 +49,7 @@ function _omz_diagnostic_dump () {
     pstree -p $$
   fi
   #TODO: figure out how to exclude or translate terminal control characters
-  set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\|TTY\|DISPLAY\)\|OMZ'
+  set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\|TTY\|DISPLAY\|PATH\)\|OMZ'
   echo -n $reset_color
   echo 
 
