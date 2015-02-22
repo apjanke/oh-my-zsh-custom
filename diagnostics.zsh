@@ -48,8 +48,8 @@ function _omz_diagnostic_dump () {
     echo Process tree for this shell:
     pstree -p $$
   fi
-  #TODO: figure out how to exclude control characters
-  set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\)\|OMZ'
+  #TODO: figure out how to exclude or translate terminal control characters
+  set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\|TTY\|DISPLAY\)\|OMZ'
   echo -n $reset_color
   echo 
 
