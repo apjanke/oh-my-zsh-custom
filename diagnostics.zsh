@@ -34,13 +34,14 @@ function omz_diagnostic_dump () {
   local opt_verbose opts
   zparseopts -A opts -D "v+=opt_verbose"
   local verbose=${#opt_verbose}
-  echo verbose=$verbose
 
   echo oh-my-zsh diagnostic dump
-
+  echo
+  
   # Basic system and zsh information
   date
   uname -a
+  echo OSTYPE=$OSTYPE
   zsh --version
   echo User: $USER
   echo
@@ -95,6 +96,9 @@ function omz_diagnostic_dump () {
   if [[ $verbose -ge 1 ]]; then
     echo "bindkey:"
     bindkey
+    echo
+    echo "infocmp:"
+    infocmp
     echo
   fi
 
