@@ -10,18 +10,32 @@
 # be suitable for posting to public bug reports.
 #
 # The output is human-readable and its format may change over time. It is not
-# suitable for parsing.
+# suitable for parsing. All the output is in one single file so it can be posted
+# as a gist or bug comment on GitHub. GitHub doesn't support attaching tarballs
+# or other files to bugs; otherwise, this would probably have an option to produce
+# tarballs that contain copies of the config and customization files instead of
+# catting them all in to one file.
 #
 # This is intended to be widely portable, and run anywhere that oh-my-zsh does.
 # Feel free to report any portability issues as bugs.
 #
+# The verbosity level is controlled by the -v option, which increases verbosity
+# by 1 each time it is specified. Verbosity levels:
+#   0 (default) - basic info, shell state, omz configuration, git state
+#   1 - Adds key binding info and configuration file contents
+#
 # TODO:
-# * Add option parsing
-# * Add optional key binding dump
-# * Add automatic gist creation
+# * Add automatic gist uploading
+# * Handle terminal control sequences in variables
 function omz_diagnostic_dump () {
   emulate -L zsh
   local programs program 
+
+  local opt_verbose opts
+  zparseopts -A opts -D "v+=opt_verbose"
+  local verbose=${#opt_verbose}
+  echo verbose=$verbose
+
   echo oh-my-zsh diagnostic dump
 
   # Basic system and zsh information
@@ -75,6 +89,33 @@ function omz_diagnostic_dump () {
     echo "oh-my-zsh custom dir:"
     echo "   $ZSH_CUSTOM ($custom_dir)"
     (cd ${custom_dir:h} && find ${custom_dir:t} -name .git -prune -o -print)
+  fi
+
+  # Key binding and terminal info
+  if [[ $verbose -ge 1 ]]; then
+    echo "bindkey:"
+    bindkey
+    echo
+  fi
+
+  # Full configuration file info
+  if [[ $verbose -ge 1 ]]; then
+    local cfgfile cfgfiles
+    local zdotdir=${ZDOTDIR:-$HOME}
+    echo "Zsh configuration files:"
+    cfgfiles=( /etc/zshenv /etc/zprofile /etc/zshrc /etc/zlogin /etc/zlogout $zdotdir/.zshenv $zdotdir/.zprofile $zdotdir/.zshrc $zdotdir/.zlogin $zdotdir/.zlogout )
+    for cfgfile in $cfgfiles; do
+      if [[ ( -f $cfgfile || -h $cfgfile ) ]]; then
+        echo $cfgfile
+        if [[ -h $cfgfile ]]; then
+          echo "    ( => ${cfgfile:A} )"
+        fi
+        echo "=================================================="
+        cat $cfgfile
+        echo
+        echo
+      fi
+    done
   fi
 }
 
