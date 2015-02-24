@@ -27,6 +27,7 @@
 # TODO:
 # * Add automatic gist uploading
 # * Handle terminal control sequences in variables
+# * Do not emit reset sequence when piping to file
 function omz_diagnostic_dump () {
   emulate -L zsh
   local programs program 
@@ -37,7 +38,7 @@ function omz_diagnostic_dump () {
 
   echo oh-my-zsh diagnostic dump
   echo
-  
+
   # Basic system and zsh information
   date
   uname -a
@@ -66,7 +67,12 @@ function omz_diagnostic_dump () {
   #TODO: figure out how to exclude or translate terminal control characters
   set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\|TTY\|DISPLAY\|PATH\)\|OMZ'
   echo -n $reset_color
+  echo Exported:
+  echo $(export | sed 's/=.*//')
   echo 
+  echo Locale:
+  locale
+  echo
 
   # Zsh configuration
   echo Zsh configuration:
