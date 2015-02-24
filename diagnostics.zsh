@@ -19,7 +19,7 @@
 # * Add option parsing
 # * Add optional key binding dump
 # * Add automatic gist creation
-function _omz_diagnostic_dump () {
+function omz_diagnostic_dump () {
   emulate -L zsh
   local programs program 
   echo oh-my-zsh diagnostic dump
