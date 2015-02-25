@@ -54,7 +54,7 @@ function omz_diagnostic_dump () {
   done
   echo Versions:
   echo "git: $(git --version)"
-  whence bash &>/dev/null && echo "bash: $(bash --version | grep bash)"
+  whence bash &>/dev/null && echo "bash: $(bash --version | command grep bash)"
   echo
 
   # Process state
@@ -87,6 +87,9 @@ function omz_diagnostic_dump () {
   echo
   echo oh-my-zsh git state:
   (cd $ZSH && echo "HEAD: $(git rev-parse HEAD)" && git remote -v && git status | command grep "[^[:space:]]")
+  if [[ $verbose -ge 1 ]]; then
+    (cd $ZSH && git reflog --date=default | command grep pull)
+  fi
   echo
   if [[ -e $ZSH_CUSTOM ]]; then
     local custom_dir=$ZSH_CUSTOM
