@@ -16,12 +16,13 @@ function themen() {
     # Numeric index argument: select theme by index 
     local themes n name
     themes=($(lstheme))
+    themes=(${themes:|ZSH_BLACKLISTED_THEMES})
     if [[ -z $1 ]]; then
     	# Advance to next theme
     	# ... darn. Can't do that without knowing the current theme
     	#local last_n=${themes[(i)$]}
 
-    	# Screw it, we'll use a global variable
+    	# Screw it, we'll use a global variable and our own iteration sequence
     	if [[ -n $APJ_LAST_THEME_N ]]; then
     		(( n = $APJ_LAST_THEME_N + 1 ))
     	else
