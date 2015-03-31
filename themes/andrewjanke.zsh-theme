@@ -74,3 +74,4 @@ if false && [[ "$TERM_PROGRAM" == "iTerm.app" ]] && [[ -z "$INSIDE_EMACS" ]]; th
     update_terminal_title_cwd
 fi
 
+

@@ -12,7 +12,7 @@
 # purposes.
 #
 # If called without an argument, it just advances to the next theme in the list
-function themen() {
+function themen_apj() {
     # Numeric index argument: select theme by index 
     local themes n name
     themes=($(lstheme))
