@@ -42,7 +42,7 @@ function prompt_user {
 
 # Top-level function for dynamic part of prompt
 function build_prompt_front {
-    RETVAL=$?
+    local RETVAL=$?
     prompt_status
     prompt_user
 }
