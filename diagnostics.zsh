@@ -80,7 +80,7 @@ function omz_diagnostic_dump () {
 }
 
 function _omz_diagnostic_dump_one_big_text {
-  local program programs 
+  local program programs progfile md5
 
   echo oh-my-zsh diagnostic dump
   echo
@@ -94,14 +94,30 @@ function _omz_diagnostic_dump_one_big_text {
   echo
 
   # Installed programs
-  programs=(zsh bash sed cat grep find git)
+  programs=(sh zsh ksh bash sed cat grep find git posh)
   for program in $programs; do
-    echo "$program is $(which $program)"
+    local md5_str="" md5="" link_str=""
+    progfile=$(which $program)
+    if [[ $? == 0 ]]; then
+      if [[ -e $progfile ]]; then
+        if whence md5 &>/dev/null; then
+          md5=$(md5 -q $progfile)
+          md5_str=" ($md5)"
+        fi
+        if [[ -h "$progfile" ]]; then
+          link_str=" ( -> ${file:A})"
+        fi
+      fi
+      echo "$program is $progfile   ${md5_str}${link_str}"
+    else
+      echo "$program: not found"
+    fi
   done
   echo Versions:
-  echo "git: $(git --version)"
-  whence bash &>/dev/null && echo "bash: $(bash --version | command grep bash)"
   whence zsh >&/dev/null && echo "zsh: $(zsh --version)"
+  whence bash &>/dev/null && echo "bash: $(bash --version | command grep bash)"
+  echo "git: $(git --version)"
+  echo "grep: $(grep --version)"
   echo
 
   # ZSH Process state
