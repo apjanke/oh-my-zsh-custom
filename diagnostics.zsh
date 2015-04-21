@@ -4,6 +4,15 @@
 
 # omz_diagnostic_dump()
 #
+# Author: Andrew Janke <andrew@apjanke.net>
+#
+# Usage:
+#
+# omz_diagnostic_dump [-v] [-V] [file]
+#
+# NOTE: This is a work in progress. Its interface and behavior are going to change,
+# and probably in non-back-compatible ways.
+#
 # Outputs a bunch of information about the state and configuration of
 # oh-my-zsh, zsh, and the user's system. This is intended to provide a
 # bunch of context for diagnosing your own or a third party's problems, and to
@@ -19,22 +28,59 @@
 # This is intended to be widely portable, and run anywhere that oh-my-zsh does.
 # Feel free to report any portability issues as bugs.
 #
-# The verbosity level is controlled by the -v option, which increases verbosity
-# by 1 each time it is specified. Verbosity levels:
-#   0 (default) - basic info, shell state, omz configuration, git state
-#   1 - Adds key binding info and configuration file contents
+# OPTIONS
+#
+# [file]   Specifies the output file. If not given, a file in the current directory
+#        is selected automatically.
+#
+# -v    Increase the verbosity of the dump output. May be specified multiple times.
+#       Verbosity levels:
+#        0 - Basic info, shell state, omz configuration, git state
+#        1 - (default) Adds key binding info and configuration file contents
+#        2 - Adds zcompdump file contents
+#
+# -V    Reduce the verbosity of the dump output. May be specified multiple times.
 #
 # TODO:
 # * Add automatic gist uploading
-# * Handle terminal control sequences in variables
-# * Do not emit reset sequence when piping to file
+# * Consider whether to move default output file location to TMPDIR. More robust
+#     but less user friendly.
+#
 function omz_diagnostic_dump () {
   emulate -L zsh
-  local programs program 
 
-  local opt_verbose opts
-  zparseopts -A opts -D "v+=opt_verbose"
-  local verbose=${#opt_verbose}
+  local -A opts
+  local opt_verbose opt_noverbose opt_outfile
+  local timestamp=$(date +%Y%m%d-%H%M%S)
+  local outfile=omz_diagdump_$timestamp.txt
+  zparseopts -A opts -D -- "v+=opt_verbose" "V+=opt_noverbose"
+  local verbose n_verbose=${#opt_verbose} n_noverbose=${#opt_noverbose}
+  (( verbose = 1 + n_verbose - n_noverbose ))
+
+  if [[ ${#*} > 0 ]]; then
+    opt_outfile=$1
+  fi
+  if [[ -n "$opt_outfile" ]]; then
+    outfile="$opt_outfile"
+  fi
+
+  # Always write directly to a file so terminal escape sequences are
+  # captured cleanly
+  _omz_diagnostic_dump_one_big_text > "$outfile"
+
+  echo
+  echo Diagnostic dump file created at: "$outfile"
+  echo
+  echo To share this with OMZ developers, post it as a Gist on GitHub and 
+  echo share the link to the gist.
+  echo
+  echo WARNING: This dump file contains all your zsh and omz configuration files,
+  echo "so don't share it publicly if there's sensitive information in them."
+  echo
+}
+
+function _omz_diagnostic_dump_one_big_text {
+  local program programs 
 
   echo oh-my-zsh diagnostic dump
   echo
@@ -55,23 +101,26 @@ function omz_diagnostic_dump () {
   echo Versions:
   echo "git: $(git --version)"
   whence bash &>/dev/null && echo "bash: $(bash --version | command grep bash)"
+  whence zsh >&/dev/null && echo "zsh: $(zsh --version)"
   echo
 
-  # Process state
+  # ZSH Process state
   echo Process state:
   echo pwd: $PWD
   if whence pstree &>/dev/null; then
     echo Process tree for this shell:
     pstree -p $$
+  else
+    ps -fT
   fi
-  #TODO: figure out how to exclude or translate terminal control characters
   set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\|TTY\|DISPLAY\|PATH\)\|OMZ'
-  echo -n $reset_color
+  echo
+  #TODO: Should this include `env` instead of or in addition to `export`?
   echo Exported:
   echo $(export | sed 's/=.*//')
   echo 
   echo Locale:
-  locale
+  command locale
   echo
 
   # Zsh configuration
@@ -81,9 +130,8 @@ function omz_diagnostic_dump () {
 
   # Oh-my-zsh installation
   echo oh-my-zsh installation:
-  # Use cat to disable colorization
-  command ls -ld ~/.z* | cat
-  command ls -ld ~/.oh* | cat
+  command ls -ld ~/.z*
+  command ls -ld ~/.oh*
   echo
   echo oh-my-zsh git state:
   (cd $ZSH && echo "HEAD: $(git rev-parse HEAD)" && git remote -v && git status | command grep "[^[:space:]]")
@@ -99,6 +147,7 @@ function omz_diagnostic_dump () {
     echo "oh-my-zsh custom dir:"
     echo "   $ZSH_CUSTOM ($custom_dir)"
     (cd ${custom_dir:h} && find ${custom_dir:t} -name .git -prune -o -print)
+    echo
   fi
 
   # Key binding and terminal info
@@ -111,24 +160,41 @@ function omz_diagnostic_dump () {
     echo
   fi
 
-  # Full configuration file info
+  # Configuration file info
+  local zdotdir=${ZDOTDIR:-$HOME}
+  echo "Zsh configuration files:"
+  local cfgfile cfgfiles
+  cfgfiles=( /etc/zshenv /etc/zprofile /etc/zshrc /etc/zlogin /etc/zlogout 
+    $zdotdir/.zshenv $zdotdir/.zprofile $zdotdir/.zshrc $zdotdir/.zlogin $zdotdir/.zlogout )
+  command ls -lad $cfgfiles 2>&1
+  echo
   if [[ $verbose -ge 1 ]]; then
-    local cfgfile cfgfiles
-    local zdotdir=${ZDOTDIR:-$HOME}
-    echo "Zsh configuration files:"
-    cfgfiles=( /etc/zshenv /etc/zprofile /etc/zshrc /etc/zlogin /etc/zlogout $zdotdir/.zshenv $zdotdir/.zprofile $zdotdir/.zshrc $zdotdir/.zlogin $zdotdir/.zlogout )
     for cfgfile in $cfgfiles; do
-      if [[ ( -f $cfgfile || -h $cfgfile ) ]]; then
-        echo $cfgfile
-        if [[ -h $cfgfile ]]; then
-          echo "    ( => ${cfgfile:A} )"
-        fi
-        echo "=================================================="
-        cat $cfgfile
-        echo
-        echo
-      fi
+      _omz_diagnostic_dump_echo_file_w_header $cfgfile
     done
+  fi
+  echo "Zsh compdump files:"
+  local dumpfile dumpfiles
+  command ls -lad $zdotdir/.zcompdump*
+  dumpfiles=( $zdotdir/.zcompdump*(N) )
+  if [[ $verbose -ge 2 ]]; then
+    for dumpfile in $dumpfiles; do
+      _omz_diagnostic_dump_echo_file_w_header $dumpfile
+    done
+  fi
+
+}
+
+function _omz_diagnostic_dump_echo_file_w_header () {
+  local file=$1
+  if [[ ( -f $file || -h $file ) ]]; then
+    echo "========== $file =========="
+    if [[ -h $file ]]; then
+      echo "==========    ( => ${file:A} )   =========="
+    fi
+    command cat $file
+    echo "========== end $file =========="
+    echo
   fi
 }
 
