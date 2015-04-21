@@ -96,23 +96,23 @@ function _omz_diagnostic_dump_one_big_text {
   # Installed programs
   programs=(sh zsh ksh bash sed cat grep find git posh)
   for program in $programs; do
-    local md5_str="" md5="" link_str=""
+    local md5_str="" md5="" link_str="" extra_str=""
     progfile=$(which $program)
     if [[ $? == 0 ]]; then
       if [[ -e $progfile ]]; then
         if whence md5 &>/dev/null; then
-          md5=$(md5 -q $progfile)
-          md5_str=" ($md5)"
+          extra_str+=" $(md5 -q $progfile)"
         fi
         if [[ -h "$progfile" ]]; then
-          link_str=" ( -> ${file:A})"
+          extra_str+=" ( -> ${file:A} )"
         fi
       fi
-      echo "$program is $progfile   ${md5_str}${link_str}"
+      printf '%-9s %-20s %s\n' "$program is" "$progfile" "$extra_str"
     else
       echo "$program: not found"
     fi
   done
+  echo
   echo Versions:
   whence zsh >&/dev/null && echo "zsh: $(zsh --version)"
   whence bash &>/dev/null && echo "bash: $(bash --version | command grep bash)"
