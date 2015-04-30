@@ -47,11 +47,18 @@ function build_prompt_front {
     prompt_user
 }
 
-# Remove user@host for simplification
-PROMPT='[$(build_prompt_front)in %{$fg[yellow]%}%~%{$reset_color%}$(git_prompt_info)]
+# The prompt
+
+if [[ $OSTYPE == cygwin ]]; then
+    # Skip git info on Windows because it is too slow
+    PROMPT='[$(build_prompt_front)in %{$fg[yellow]%}%~%{$reset_color%}]
 $ '
+else
+    PROMPT='[$(build_prompt_front)in %{$fg[yellow]%}%~%{$reset_color%}$(git_prompt_info)]
+$ '
+fi
 
-
+# VCS indicator styling
 ZSH_THEME_GIT_PROMPT_PREFIX=" on ⇄ "
 ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[green]%}±"
 ZSH_THEME_GIT_PROMPT_TIMEDOUT=" %{$fg[yellow]%}?"
