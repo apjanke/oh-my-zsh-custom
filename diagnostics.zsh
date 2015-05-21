@@ -42,6 +42,7 @@
 # -V    Reduce the verbosity of the dump output. May be specified multiple times.
 #
 # TODO:
+# * Multi-file capture
 # * Add automatic gist uploading
 # * Consider whether to move default output file location to TMPDIR. More robust
 #     but less user friendly.
@@ -71,10 +72,10 @@ function omz_diagnostic_dump () {
   echo
   echo Diagnostic dump file created at: "$outfile"
   echo
-  echo To share this with OMZ developers, post it as a Gist on GitHub and 
-  echo share the link to the gist.
+  echo To share this with OMZ developers, post it as a gist on GitHub 
+  echo at "https://gist.github.com" and share the link to the gist.
   echo
-  echo WARNING: This dump file contains all your zsh and omz configuration files,
+  echo "WARNING: This dump file contains all your zsh and omz configuration files,"
   echo "so don't share it publicly if there's sensitive information in them."
   echo
 }
@@ -114,7 +115,7 @@ function _omz_diagnostic_dump_one_big_text {
   done
   echo
   echo Versions:
-  whence zsh >&/dev/null && echo "zsh: $(zsh --version)"
+  whence zsh &>/dev/null && echo "zsh: $(zsh --version)"
   whence bash &>/dev/null && echo "bash: $(bash --version | command grep bash)"
   echo "git: $(git --version)"
   echo "grep: $(grep --version)"
