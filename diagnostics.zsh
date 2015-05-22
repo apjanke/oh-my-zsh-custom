@@ -136,7 +136,7 @@ function _omz_diag_dump_one_big_text {
   builtin echo Process state:
   builtin echo pwd: $PWD
   if builtin whence pstree &>/dev/null; then
-    echo Process tree for this shell:
+    builtin echo Process tree for this shell:
     pstree -p $$
   else
     ps -fT
@@ -145,7 +145,7 @@ function _omz_diag_dump_one_big_text {
   builtin echo
   #TODO: Should this include `env` instead of or in addition to `export`?
   builtin echo Exported:
-  builtin echo $(builtin export | sed 's/=.*//')
+  builtin echo $(builtin export | command sed 's/=.*//')
   builtin echo 
   builtin echo Locale:
   command locale
