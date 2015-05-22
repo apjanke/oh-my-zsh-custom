@@ -28,6 +28,11 @@
 # This is intended to be widely portable, and run anywhere that oh-my-zsh does.
 # Feel free to report any portability issues as bugs.
 #
+# This is written in a defensive style so it still works (and can detect) cases when
+# basic functionality like echo and which have been redefined. In particular, almost
+# everything is invoked with "builtin" or "command", to work in the face of user 
+# redefinitions.
+#
 # OPTIONS
 #
 # [file]   Specifies the output file. If not given, a file in the current directory
@@ -42,6 +47,7 @@
 # -V    Reduce the verbosity of the dump output. May be specified multiple times.
 #
 # TODO:
+# * Make overriding "builtin", "command", or "local" a fatal error
 # * Multi-file capture
 # * Add automatic gist uploading
 # * Consider whether to move default output file location to TMPDIR. More robust
@@ -54,7 +60,7 @@ function omz_diagnostic_dump () {
   local opt_verbose opt_noverbose opt_outfile
   local timestamp=$(date +%Y%m%d-%H%M%S)
   local outfile=omz_diagdump_$timestamp.txt
-  zparseopts -A opts -D -- "v+=opt_verbose" "V+=opt_noverbose"
+  builtin zparseopts -A opts -D -- "v+=opt_verbose" "V+=opt_noverbose"
   local verbose n_verbose=${#opt_verbose} n_noverbose=${#opt_noverbose}
   (( verbose = 1 + n_verbose - n_noverbose ))
 
@@ -67,153 +73,200 @@ function omz_diagnostic_dump () {
 
   # Always write directly to a file so terminal escape sequences are
   # captured cleanly
-  _omz_diagnostic_dump_one_big_text > "$outfile"
+  _omz_diag_dump_one_big_text &> "$outfile"
 
-  echo
-  echo Diagnostic dump file created at: "$outfile"
-  echo
-  echo To share this with OMZ developers, post it as a gist on GitHub 
-  echo at "https://gist.github.com" and share the link to the gist.
-  echo
-  echo "WARNING: This dump file contains all your zsh and omz configuration files,"
-  echo "so don't share it publicly if there's sensitive information in them."
-  echo
+  builtin echo
+  builtin echo Diagnostic dump file created at: "$outfile"
+  builtin echo
+  builtin echo To share this with OMZ developers, post it as a gist on GitHub 
+  builtin echo at "https://gist.github.com" and share the link to the gist.
+  builtin echo
+  builtin echo "WARNING: This dump file contains all your zsh and omz configuration files,"
+  builtin echo "so don't share it publicly if there's sensitive information in them."
+  builtin echo
+
 }
 
-function _omz_diagnostic_dump_one_big_text {
+function _omz_diag_dump_one_big_text {
   local program programs progfile md5
 
-  echo oh-my-zsh diagnostic dump
-  echo
+  builtin echo oh-my-zsh diagnostic dump
+  builtin echo
 
   # Basic system and zsh information
-  date
-  uname -a
-  echo OSTYPE=$OSTYPE
-  zsh --version
-  echo User: $USER
-  echo
+  command date
+  command uname -a
+  builtin echo OSTYPE=$OSTYPE
+  command zsh --version
+  builtin echo User: $USER
+  builtin echo
 
   # Installed programs
   programs=(sh zsh ksh bash sed cat grep find git posh)
   for program in $programs; do
     local md5_str="" md5="" link_str="" extra_str=""
-    progfile=$(which $program)
+    progfile=$(builtin which $program)
     if [[ $? == 0 ]]; then
       if [[ -e $progfile ]]; then
-        if whence md5 &>/dev/null; then
+        if builtin whence md5 &>/dev/null; then
           extra_str+=" $(md5 -q $progfile)"
         fi
         if [[ -h "$progfile" ]]; then
           extra_str+=" ( -> ${file:A} )"
         fi
       fi
-      printf '%-9s %-20s %s\n' "$program is" "$progfile" "$extra_str"
+      builtin printf '%-9s %-20s %s\n' "$program is" "$progfile" "$extra_str"
     else
-      echo "$program: not found"
+      builtin echo "$program: not found"
     fi
   done
-  echo
-  echo Versions:
-  whence zsh &>/dev/null && echo "zsh: $(zsh --version)"
-  whence bash &>/dev/null && echo "bash: $(bash --version | command grep bash)"
-  echo "git: $(git --version)"
-  echo "grep: $(grep --version)"
-  echo
+  builtin echo
+  builtin echo Versions:
+  builtin echo "zsh: $(zsh --version)"
+  builtin echo "bash: $(bash --version | command grep bash)"
+  builtin echo "git: $(git --version)"
+  builtin echo "grep: $(grep --version)"
+  builtin echo
+
+  # Core command definitions
+  _omz_diag_dump_check_core_commands
+  builtin echo  
 
   # ZSH Process state
-  echo Process state:
-  echo pwd: $PWD
-  if whence pstree &>/dev/null; then
+  builtin echo Process state:
+  builtin echo pwd: $PWD
+  if builtin whence pstree &>/dev/null; then
     echo Process tree for this shell:
     pstree -p $$
   else
     ps -fT
   fi
-  set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\|TTY\|DISPLAY\|PATH\)\|OMZ'
-  echo
+  builtin set | command grep -a '^\(ZSH\|plugins\|TERM\|LC_\|LANG\|precmd\|chpwd\|preexec\|FPATH\|TTY\|DISPLAY\|PATH\)\|OMZ'
+  builtin echo
   #TODO: Should this include `env` instead of or in addition to `export`?
-  echo Exported:
-  echo $(export | sed 's/=.*//')
-  echo 
-  echo Locale:
+  builtin echo Exported:
+  builtin echo $(builtin export | sed 's/=.*//')
+  builtin echo 
+  builtin echo Locale:
   command locale
-  echo
+  builtin echo
 
   # Zsh configuration
-  echo Zsh configuration:
-  echo setopt: $(setopt)
-  echo
+  builtin echo Zsh configuration:
+  builtin echo setopt: $(builtin setopt)
+  builtin echo
 
   # Oh-my-zsh installation
-  echo oh-my-zsh installation:
+  builtin echo oh-my-zsh installation:
   command ls -ld ~/.z*
   command ls -ld ~/.oh*
-  echo
-  echo oh-my-zsh git state:
-  (cd $ZSH && echo "HEAD: $(git rev-parse HEAD)" && git remote -v && git status | command grep "[^[:space:]]")
+  builtin echo
+  builtin echo oh-my-zsh git state:
+  (cd $ZSH && builtin echo "HEAD: $(git rev-parse HEAD)" && git remote -v && git status | command grep "[^[:space:]]")
   if [[ $verbose -ge 1 ]]; then
     (cd $ZSH && git reflog --date=default | command grep pull)
   fi
-  echo
+  builtin echo
   if [[ -e $ZSH_CUSTOM ]]; then
     local custom_dir=$ZSH_CUSTOM
     if [[ -h $custom_dir ]]; then
       custom_dir=$(cd $custom_dir && pwd -P)
     fi
-    echo "oh-my-zsh custom dir:"
-    echo "   $ZSH_CUSTOM ($custom_dir)"
-    (cd ${custom_dir:h} && find ${custom_dir:t} -name .git -prune -o -print)
-    echo
+    builtin echo "oh-my-zsh custom dir:"
+    builtin echo "   $ZSH_CUSTOM ($custom_dir)"
+    (cd ${custom_dir:h} && command find ${custom_dir:t} -name .git -prune -o -print)
+    builtin echo
   fi
 
   # Key binding and terminal info
   if [[ $verbose -ge 1 ]]; then
-    echo "bindkey:"
-    bindkey
-    echo
-    echo "infocmp:"
-    infocmp
-    echo
+    builtin echo "bindkey:"
+    builtin bindkey
+    builtin echo
+    builtin echo "infocmp:"
+    command infocmp
+    builtin echo
   fi
 
   # Configuration file info
   local zdotdir=${ZDOTDIR:-$HOME}
-  echo "Zsh configuration files:"
+  builtin echo "Zsh configuration files:"
   local cfgfile cfgfiles
   cfgfiles=( /etc/zshenv /etc/zprofile /etc/zshrc /etc/zlogin /etc/zlogout 
     $zdotdir/.zshenv $zdotdir/.zprofile $zdotdir/.zshrc $zdotdir/.zlogin $zdotdir/.zlogout )
   command ls -lad $cfgfiles 2>&1
-  echo
+  builtin echo
   if [[ $verbose -ge 1 ]]; then
     for cfgfile in $cfgfiles; do
-      _omz_diagnostic_dump_echo_file_w_header $cfgfile
+      _omz_diag_dump_echo_file_w_header $cfgfile
     done
   fi
-  echo "Zsh compdump files:"
+  builtin echo "Zsh compdump files:"
   local dumpfile dumpfiles
   command ls -lad $zdotdir/.zcompdump*
   dumpfiles=( $zdotdir/.zcompdump*(N) )
   if [[ $verbose -ge 2 ]]; then
     for dumpfile in $dumpfiles; do
-      _omz_diagnostic_dump_echo_file_w_header $dumpfile
+      _omz_diag_dump_echo_file_w_header $dumpfile
     done
   fi
 
 }
 
-function _omz_diagnostic_dump_echo_file_w_header () {
-  local file=$1
-  if [[ ( -f $file || -h $file ) ]]; then
-    echo "========== $file =========="
-    if [[ -h $file ]]; then
-      echo "==========    ( => ${file:A} )   =========="
+function _omz_diag_dump_check_core_commands () {
+  builtin echo "Core command check:"
+  local redefined name builtins externals
+  redefined=()
+  # All the zsh non-module builtin commands
+  # These are taken from the zsh reference manual for 5.0.2
+  # Commands from modules should not be included.
+  # (For back-compatibility, if any of these are newish, they should be removed,
+  # or at least made conditional on the version of the current running zsh.)
+  # "history" is also excluded because OMZ is known to redefine that
+  builtins=( alias autoload bg bindkey break builtin bye cd chdir command
+    comparguments compcall compctl compdescribe compfiles compgroups compquote comptags
+    comptry compvalues continue declare dirs disable disown echo echotc echoti emulate
+    enable eval exec exit export false fc fg float functions getln getopts hash
+    integer jobs kill let limit local log logout noglob popd print printf
+    pushd pushln pwd r read readonly rehash return sched set setopt shift
+    source suspend test times trap true ttyctl type typeset ulimit umask unalias
+    unfunction unhash unlimit unset unsetopt vared wait whence where which zcompile
+    zle zmodload zparseopts zregexparse zstyle )
+  externals=( zsh )
+  for name in $builtins; do
+    if [[ $(builtin whence -w $name) != "$name: builtin" ]]; then
+      builtin echo "builtin '$name' has been redefined"
+      builtin which $name
+      redefined+=$name
     fi
-    command cat $file
-    echo "========== end $file =========="
-    echo
+  done
+  for name in $externals; do
+    if [[ $(builtin whence -w $name) != "$name: command" ]]; then
+      builtin echo "command '$name' has been redefined"
+      builtin which $name
+      redefined+=$name
+    fi
+  done
+
+  if [[ -n "$redefined" ]]; then
+    builtin echo "SOME CORE COMMANDS HAVE BEEN REDEFINED: $redefined"
+  else
+    builtin echo "All core commands are defined normally"
   fi
+
 }
 
+function _omz_diag_dump_echo_file_w_header () {
+  local file=$1
+  if [[ ( -f $file || -h $file ) ]]; then
+    builtin echo "========== $file =========="
+    if [[ -h $file ]]; then
+      builtin echo "==========    ( => ${file:A} )   =========="
+    fi
+    command cat $file
+    builtin echo "========== end $file =========="
+    builtin echo
+  fi
+}
 
 
