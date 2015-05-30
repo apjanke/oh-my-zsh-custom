@@ -67,6 +67,10 @@ function omz_diagnostic_dump() {
   if [[ ${#*} > 0 ]]; then
     opt_outfile=$1
   fi
+  if [[ ${#*} > 1 ]]; then
+    echo "Error: too many arguments" >&2
+    return 1
+  fi
   if [[ -n "$opt_outfile" ]]; then
     outfile="$opt_outfile"
   fi
