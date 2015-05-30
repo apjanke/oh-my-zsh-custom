@@ -53,7 +53,7 @@
 # * Consider whether to move default output file location to TMPDIR. More robust
 #     but less user friendly.
 #
-function omz_diagnostic_dump () {
+function omz_diagnostic_dump() {
   emulate -L zsh
 
   local -A opts
@@ -87,7 +87,7 @@ function omz_diagnostic_dump () {
 
 }
 
-function _omz_diag_dump_one_big_text {
+function _omz_diag_dump_one_big_text() {
   local program programs progfile md5
 
   builtin echo oh-my-zsh diagnostic dump
@@ -213,7 +213,7 @@ function _omz_diag_dump_one_big_text {
 
 }
 
-function _omz_diag_dump_check_core_commands () {
+function _omz_diag_dump_check_core_commands() {
   builtin echo "Core command check:"
   local redefined name builtins externals
   redefined=()
@@ -256,7 +256,7 @@ function _omz_diag_dump_check_core_commands () {
 
 }
 
-function _omz_diag_dump_echo_file_w_header () {
+function _omz_diag_dump_echo_file_w_header() {
   local file=$1
   if [[ ( -f $file || -h $file ) ]]; then
     builtin echo "========== $file =========="
