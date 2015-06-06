@@ -47,7 +47,6 @@
 # -V    Reduce the verbosity of the dump output. May be specified multiple times.
 #
 # TODO:
-# * Make overriding "builtin", "command", or "local" a fatal error
 # * Multi-file capture
 # * Add automatic gist uploading
 # * Consider whether to move default output file location to TMPDIR. More robust
@@ -56,6 +55,7 @@
 function omz_diagnostic_dump() {
   emulate -L zsh
 
+  local thisfcn=omz_diagnostic_dump
   local -A opts
   local opt_verbose opt_noverbose opt_outfile
   local timestamp=$(date +%Y%m%d-%H%M%S)
@@ -68,7 +68,7 @@ function omz_diagnostic_dump() {
     opt_outfile=$1
   fi
   if [[ ${#*} > 1 ]]; then
-    echo "Error: too many arguments" >&2
+    builtin echo "$thisfcn: error: too many arguments" >&2
     return 1
   fi
   if [[ -n "$opt_outfile" ]]; then
@@ -78,6 +78,9 @@ function omz_diagnostic_dump() {
   # Always write directly to a file so terminal escape sequences are
   # captured cleanly
   _omz_diag_dump_one_big_text &> "$outfile"
+  if [[ $? != 0 ]]; then
+    builtin echo "$thisfcn: error while creating diagnostic dump; see $outfile for details"
+  fi
 
   builtin echo
   builtin echo Diagnostic dump file created at: "$outfile"
@@ -134,7 +137,7 @@ function _omz_diag_dump_one_big_text() {
   builtin echo
 
   # Core command definitions
-  _omz_diag_dump_check_core_commands
+  _omz_diag_dump_check_core_commands || return 1
   builtin echo  
 
   # ZSH Process state
@@ -194,11 +197,11 @@ function _omz_diag_dump_one_big_text() {
   fi
 
   # Configuration file info
-  # Some files for bash that zsh does not use are intentionally included
-  # to help with diagnosing behavior differences between bash and zsh
   local zdotdir=${ZDOTDIR:-$HOME}
   builtin echo "Zsh configuration files:"
   local cfgfile cfgfiles
+  # Some files for bash that zsh does not use are intentionally included
+  # to help with diagnosing behavior differences between bash and zsh
   cfgfiles=( /etc/zshenv /etc/zprofile /etc/zshrc /etc/zlogin /etc/zlogout 
     $zdotdir/.zshenv $zdotdir/.zprofile $zdotdir/.zshrc $zdotdir/.zlogin $zdotdir/.zlogout
     ~/.zsh-pre-oh-my-zsh
@@ -242,6 +245,7 @@ function _omz_diag_dump_check_core_commands() {
     source suspend test times trap true ttyctl type typeset ulimit umask unalias
     unfunction unhash unlimit unset unsetopt vared wait whence where which zcompile
     zle zmodload zparseopts zregexparse zstyle )
+  builtins_fatal=( builtin command local )
   externals=( zsh )
   for name in $builtins; do
     if [[ $(builtin whence -w $name) != "$name: builtin" ]]; then
