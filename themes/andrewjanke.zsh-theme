@@ -13,8 +13,9 @@ export LSCOLORS="exfxdxdxdxexexdxdxgxgx"
 #export LS_COLORS="di=36:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
 export LS_COLORS="di=34:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
 
+# Sets prompt character based on what kind of repo you're in
+# (Not currently used)
 # Useful characters: ⇄ • ☿ ✘ ↕
-# Prompt
 function prompt_char_from_vcs {
     git branch >/dev/null 2>/dev/null && echo '⇄ ' && return
     # Disabling the hg check for speed reasons
@@ -26,20 +27,15 @@ function prompt_char_from_vcs {
 # - was there an error
 # - am I root
 function prompt_status {
-    local symbols
-    symbols=()
-    [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘"
-    [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}ROOT"
-
-    [[ -n "$symbols" ]] && echo -n "$symbols %{$reset_color%}"
+    echo -n '%(?::%F{cyan}✘%f )%(#:%F{yellow}ROOT %f:)'
 }
 
 # Display user info, abbreviating default case
 function prompt_user {
     if [[ "$USER" != $ZSH_DEFAULT_USER || -n "$SSH_CLIENT" ]]; then
-        echo -n "%{$fg[cyan]%}%n@%m%{$reset_color%} "
+        echo -n "%F{cyan}%n@%m%f "
     else
-        echo -n "%{$fg[cyan]%}@%{$reset_color%} "
+        echo -n "%F{cyan}@%f "
     fi
 }
 
@@ -54,20 +50,20 @@ function build_prompt_front {
 
 if [[ $OSTYPE == cygwin ]]; then
     # Skip git info on Windows because it is too slow
-    PROMPT='[$(build_prompt_front)in %{$fg[yellow]%}%~%{$reset_color%}]
+    PROMPT='[$(build_prompt_front)in %F{yellow}%~%f]
 $ '
 else
-    PROMPT='[$(build_prompt_front)in %{$fg[yellow]%}%~%{$reset_color%}$(git_prompt_info)]
+    PROMPT='[$(build_prompt_front)in %F{yellow}%~%f$(git_prompt_info)]
 $ '
 fi
 
 # VCS indicator styling
 ZSH_THEME_GIT_PROMPT_PREFIX=" on ⇄ "
-ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[green]%}±"
-ZSH_THEME_GIT_PROMPT_TIMEDOUT=" %{$fg[yellow]%}?"
-ZSH_THEME_GIT_PROMPT_UNTRACKED=" %{$fg[green]%}?"
+ZSH_THEME_GIT_PROMPT_DIRTY=" %F{green}±%f"
+ZSH_THEME_GIT_PROMPT_TIMEDOUT=" %F{yellow}?%f"
+ZSH_THEME_GIT_PROMPT_UNTRACKED=" %F{green}?%f"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
-ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_SUFFIX=""
 
 ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE='(ahr)'
 ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE='(bhr)'
@@ -99,4 +95,5 @@ if false && [[ "$TERM_PROGRAM" == "iTerm.app" ]] && [[ -z "$INSIDE_EMACS" ]]; th
     update_terminal_title_cwd
 fi
 
-
+# Completion LS_COLORS need to be set *after* LS_COLORS is set up
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
