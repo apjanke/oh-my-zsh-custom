@@ -40,7 +40,7 @@ function themen_apj() {
 # Show all 256 colors with color number
 function spectrum_ls2() {
   for code in {000..255}; do
-    print "$code: ${FG[$code]}$ZSH_SPECTRUM_TEXT${FX[reset]}"
+    print -P "$code: ${FG[$code]}$ZSH_SPECTRUM_TEXT${FX[reset]}"
   done
 }
 
