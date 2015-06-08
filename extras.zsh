@@ -36,3 +36,11 @@ function themen_apj() {
     APJ_LAST_THEME_N=$n
     theme $name
 }
+
+# Show all 256 colors with color number
+function spectrum_ls2() {
+  for code in {000..255}; do
+    print "$code: ${FG[$code]}$ZSH_SPECTRUM_TEXT${FX[reset]}"
+  done
+}
+
