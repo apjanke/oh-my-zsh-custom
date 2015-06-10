@@ -5,6 +5,9 @@
 #
 # Logic is based on "My Extravagant Zsh Prompt" and the "agnoster" oh-my-zsh 
 # theme (https://gist.github.com/agnoster/3712874)
+#
+# TODO: Replace "$(...)" subshell function calls with regular function calls
+# that extend a shared variable, to make performance better on Windows.
 
 # Calm ls colors without bold directories or red executables
 #export LSCOLORS="gxfxdxdxdxexexdxdxgxgx"
