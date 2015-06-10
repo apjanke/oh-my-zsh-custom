@@ -1,4 +1,8 @@
-#! /bin/zsh
+#!/bin/zsh
+# Andrew's modified spectrum.zsh from PR 3965 and 3966
+#    https://github.com/robbyrussell/oh-my-zsh/pull/3966
+#    https://github.com/robbyrussell/oh-my-zsh/pull/3965
+#
 # A script to make using 256 colors in zsh less painful.
 # P.C. Shyamshankar <sykora@lucentbeing.com>
 # Copied from http://github.com/sykora/etc/blob/master/zsh/functions/spectrum/
@@ -32,6 +36,6 @@ function spectrum_ls() {
 # Show all 256 colors where the background is set to specific color
 function spectrum_bls() {
   for code in {000..255}; do
-    print -P -- "$BG[$code]$code: $ZSH_SPECTRUM_TEXT %{$reset_color%}"
+    print -P -- "$code: %{$BG[$code]%}$ZSH_SPECTRUM_TEXT%{$reset_color%}"
   done
 }

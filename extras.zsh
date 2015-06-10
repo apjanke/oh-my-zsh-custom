@@ -12,7 +12,7 @@
 # purposes.
 #
 # If called without an argument, it just advances to the next theme in the list
-function themen_apj() {
+function themen() {
     # Numeric index argument: select theme by index 
     local themes n name
     themes=($(lstheme))
@@ -37,10 +37,4 @@ function themen_apj() {
     theme $name
 }
 
-# Show all 256 colors with color number
-function spectrum_ls2() {
-  for code in {000..255}; do
-    print -P "$code: ${FG[$code]}$ZSH_SPECTRUM_TEXT${FX[reset]}"
-  done
-}
 
