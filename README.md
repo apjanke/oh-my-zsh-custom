@@ -1,6 +1,6 @@
 # oh-my-zsh-custom
 
-These are Andrew Janke's customizations to go with [oh-my-zsh ("OMZ")](https://github.com/robbyrussell/oh-my-zsh). 
+These are Andrew Janke's customizations to go with [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) ("OMZ").
 
 This includes:
 
@@ -30,7 +30,7 @@ TODO:
 
 * Terminal.app support in main termsupport
  * https://github.com/robbyrussell/oh-my-zsh/pull/3582
- 
+
 ## Usage
 
 By convention, I clone this locally to `~/.oh-my-zsh-custom`, but any location will work. `$ZSH_CUSTOM` must be pointed at this in `~/.zshrc` before initializing OMZ.
