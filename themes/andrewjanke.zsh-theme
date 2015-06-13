@@ -10,11 +10,10 @@
 # that extend a shared variable, to make performance better on Windows.
 
 # Calm ls colors without bold directories or red executables
-#export LSCOLORS="gxfxdxdxdxexexdxdxgxgx"
-export LSCOLORS="exfxdxdxdxexexdxdxgxgx"
+# This is designed for a light-on-dark theme
+export LSCOLORS="gxfxdxdxdxexexdxdxgxgx"
 # GNU version of same scheme
-#export LS_COLORS="di=36:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
-export LS_COLORS="di=34:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
+export LS_COLORS="di=36:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
 
 # Sets prompt character based on what kind of repo you're in
 # (Not currently used)
@@ -98,5 +97,5 @@ if false && [[ "$TERM_PROGRAM" == "iTerm.app" ]] && [[ -z "$INSIDE_EMACS" ]]; th
     update_terminal_title_cwd
 fi
 
-# Completion LS_COLORS need to be set *after* LS_COLORS is set up
+# Completion LS_COLORS needs to be set *after* LS_COLORS is set up
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
