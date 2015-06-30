@@ -6,8 +6,8 @@
 # Logic is based on "My Extravagant Zsh Prompt" and the "agnoster" oh-my-zsh 
 # theme (https://gist.github.com/agnoster/3712874)
 #
-# TODO: Replace "$(...)" subshell function calls with regular function calls
-# that extend a shared variable, to make performance better on Windows.
+# TODO: Replace "$(...)" capturing subshell calls with regular function calls
+# that use shared variables, to improve performance, especially on Windows.
 
 # Calm ls colors without bold directories or red executables
 #export LSCOLORS="gxfxdxdxdxexexdxdxgxgx"
@@ -15,6 +15,9 @@ export LSCOLORS="exfxdxdxdxexexdxdxgxgx"
 # GNU version of same scheme
 #export LS_COLORS="di=36:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
 export LS_COLORS="di=34:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
+# Make completion LS_COLORS consistent my main LS_COLORS
+# This needs to be set *after* LS_COLORS is set up
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # Sets prompt character based on what kind of repo you're in
 # (Not currently used)
@@ -26,21 +29,16 @@ function prompt_char_from_vcs {
     echo '$'
 }
 
-# Builds flags indicating status:
-# - was there an error
-# - am I root
-function prompt_status {
-    echo -n '%(?::%F{cyan}✘%f )%(#:%F{yellow}ROOT %f:)'
-}
+# The prompt
 
-# Display user info, abbreviating default case
-function prompt_user {
-    if [[ "$USER" != $ZSH_DEFAULT_USER || -n "$SSH_CLIENT" ]]; then
-        echo -n "%F{cyan}%n@%m%f "
-    else
-        echo -n "%F{cyan}@%f "
-    fi
-}
+if [[ $OSTYPE == cygwin ]]; then
+    # Skip git info on Windows because it is too slow
+    PROMPT='[$(build_prompt_front)%F{yellow}%~%f]
+$ '
+else
+    PROMPT='[$(build_prompt_front)%F{yellow}%~%f$(git_prompt_info)]
+$ '
+fi
 
 # Top-level function for dynamic part of prompt
 function build_prompt_front {
@@ -49,16 +47,23 @@ function build_prompt_front {
     prompt_user
 }
 
-# The prompt
+# Builds flags indicating status:
+# - was there an error (cyan ✘)
+# - am I root (red #, like bash's root-indicating prompt)
+function prompt_status {
+    echo -n '%(?::%F{cyan}✘%f )%(#:%F{red}#%f :)'
+}
 
-if [[ $OSTYPE == cygwin ]]; then
-    # Skip git info on Windows because it is too slow
-    PROMPT='[$(build_prompt_front)in %F{yellow}%~%f]
-$ '
-else
-    PROMPT='[$(build_prompt_front)in %F{yellow}%~%f$(git_prompt_info)]
-$ '
-fi
+# Display user info, abbreviating default case
+function prompt_user {
+    if [[ "$USER" == $ZSH_DEFAULT_USER && -z "$SSH_CLIENT" ]]; then
+        # Default user on local host: just an "@"
+        #echo -n "%F{cyan}@%f "
+    else
+        # Otherwise, show "user@host"
+        echo -n "%F{cyan}%n@%m%f "
+    fi
+}
 
 # VCS indicator styling
 ZSH_THEME_GIT_PROMPT_PREFIX=" on ⇄ "
@@ -98,5 +103,4 @@ if false && [[ "$TERM_PROGRAM" == "iTerm.app" ]] && [[ -z "$INSIDE_EMACS" ]]; th
     update_terminal_title_cwd
 fi
 
-# Completion LS_COLORS need to be set *after* LS_COLORS is set up
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
