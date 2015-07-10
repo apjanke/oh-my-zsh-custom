@@ -13,3 +13,28 @@ function autotitle {
 function autotitle_enable {
   DISABLE_AUTO_TITLE=false
 }
+
+# Quote a terminal escape string, terminfo-style
+# This makes control sequences from $terminfo readable
+#
+# Example:
+#  tiquote $terminfo[kcuu1]
+function tiquote {
+  emulate -L zsh
+  local str out i ch
+  local ESC=$'\033'
+  str="$1"
+  out=""
+  for ((i = 1; i <= ${#str}; ++i)); do
+    ch="$str[i]"
+    #printf "%s: ch is %s\n" $i "$ch"
+    if [[ $ch == "$ESC" ]]; then
+      out+="\\E"
+    else
+      out+="$ch"
+    fi
+  done
+  printf '%s\n' "$out"
+}
+
+
