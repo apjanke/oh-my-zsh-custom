@@ -23,23 +23,25 @@ function build_prompt_front {
   # Flags indicating status:
   # - was there an error (cyan ✘)
   # - am I root (red #, like bash's root-indicating prompt)
-  print -n '%(?::%F{cyan}✘%f )%(#:%F{red}#%f :)'
+  print -n '%(?::%F{yellow}✘%f )%(#:%F{red}#%f :)'
   # Display user info, abbreviating default case
   if [[ "$USER" == $ZSH_DEFAULT_USER && -z "$SSH_CLIENT" ]]; then
-    # Default user on local host: just an "@"
-    #print -n "%F{cyan}@%f "
+    if [[ -n "$SSH_CLIENT" ]]; then
+      # Default user on remote host: just "@host"
+      print -n "%F{yellow}@%m%f "
+    fi
   else
     # Otherwise, show "user@host"
-    print -n "%F{cyan}%n@%m%f "
+    print -n "%F{yellow}%n@%m%f "
   fi
 }
 
 if [[ $OSTYPE == cygwin ]]; then
   # Skip git info on Windows because it is too slow
-  PROMPT="[$(build_prompt_front)%F{yellow}%~%f]
+  PROMPT="[$(build_prompt_front)%F{blue}%~%f]
 $ "
 else
-  PROMPT="[$(build_prompt_front)%F{yellow}%~%f\$(git_prompt_info)]
+  PROMPT="[$(build_prompt_front)%F{blue}%~%f\$(git_prompt_info)]
 $ "
 fi
 
