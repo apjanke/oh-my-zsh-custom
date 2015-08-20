@@ -12,8 +12,7 @@
 # Calm ls colors without bold directories or red executables
 # This is designed for a light-on-dark theme
 export LSCOLORS="gxfxdxdxdxexexdxdxgxgx"
-# GNU version of same scheme
-export LS_COLORS="di=36:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
+export LS_COLORS=$(omz_lscolors_bsd_to_gnu $LSCOLORS)
 # Make completion LS_COLORS consistent with main LS_COLORS
 zstyle -e ':completion:*' list-colors 'reply=${(s.:.)LS_COLORS}'
 
