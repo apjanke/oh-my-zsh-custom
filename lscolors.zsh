@@ -23,7 +23,7 @@ function omz_lscolors_bsd_to_gnu() {
   bsd_positions=( di ln so pi ex bd cd su sg tw ow)
   local -A fg_map
   local -A bg_map bg_map_bright
-  # The BSD ls manual talks about "bold" standard ANSI colors, which the terminal may map to bright
+  # The BSD ls man page talks about "bold" standard ANSI colors, which the terminal may map to bright
   # colors, or draw in bold text.
   # The GNU LS definition has both a bold flag ("1") and bright variants of all the colors.
   # Experimentally, it looks like they really are using bold text, and the bold variants of
