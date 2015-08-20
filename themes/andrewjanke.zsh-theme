@@ -13,11 +13,9 @@
 # This is designed for a light-on-dark theme
 export LSCOLORS="gxfxdxdxdxexexdxdxgxgx"
 # GNU version of same scheme
-#export LS_COLORS="di=36:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
-export LS_COLORS="di=34:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
-# Make completion LS_COLORS consistent my main LS_COLORS
-# This needs to be set *after* LS_COLORS is set up
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+export LS_COLORS="di=36:ln=35:so=33:pi=33:ex=33:bd=34:cd=34:su=33:sg=33:tw=36:ow=36:"
+# Make completion LS_COLORS consistent with main LS_COLORS
+zstyle -e ':completion:*' list-colors 'reply=${(s.:.)LS_COLORS}'
 
 # Sets prompt character based on what kind of repo you're in
 # (Not currently used)
