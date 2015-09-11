@@ -11,7 +11,7 @@
 
 # Calm ls colors without bold directories or red executables
 # This is designed for a light-on-dark theme
-export LSCOLORS="gxfxdxdxdxexexdxdxgxgx"
+export LSCOLORS="gxxxdxdxdxexexdxdxgxgx"
 export LS_COLORS=$(omz_lscolors_bsd_to_gnu $LSCOLORS)
 # Make completion LS_COLORS consistent with main LS_COLORS
 zstyle -e ':completion:*' list-colors 'reply=${(s.:.)LS_COLORS}'
@@ -21,31 +21,32 @@ zstyle -e ':completion:*' list-colors 'reply=${(s.:.)LS_COLORS}'
 # Top-level function for dynamic part of prompt
 function build_prompt_front {
   # Flags indicating status:
-  # - was there an error (cyan ✘)
   # - am I root (red #, like bash's root-indicating prompt)
-  print -n '%(?::%F{yellow}✘%f )%(#:%F{red}#%f :)'
+  print -n '%(#:%F{red}#%f :)'
   # Display user info, abbreviating default case
-  if [[ "$USER" == $ZSH_DEFAULT_USER && -z "$SSH_CLIENT" ]]; then
+  if [[ "$USER" == $ZSH_DEFAULT_USER ]]; then
     if [[ -n "$SSH_CLIENT" ]]; then
       # Default user on remote host: just "@host"
-      print -n "%F{yellow}@%m%f "
+      print -n "%F{blue}@%m%f "
     fi
+    # Default user on local host: show nothing
   else
     # Otherwise, show "user@host"
-    print -n "%F{yellow}%n@%m%f "
+    print -n "%F{blue}%n@%m%f "
   fi
 }
 
+# - was there an error (bright ✘)
 if [[ $OSTYPE == cygwin ]]; then
   # Skip git info on Windows because it is too slow
-  PROMPT="[$(build_prompt_front)%F{blue}%~%f]
-$ "
+  PROMPT="[$(build_prompt_front)%F{cyan}%~%f]
+%(?::%F{yellow}✘%f )$ "
 else
-  PROMPT="[$(build_prompt_front)%F{blue}%~%f\$(git_prompt_info)]
-$ "
+  PROMPT="[$(build_prompt_front)%F{cyan}%~%f\$(git_prompt_info)]
+%(?::%F{yellow}✘%f )$ "
 fi
 
-# VCS indicator styling
+# VCS indicator styling for OMZ
 ZSH_THEME_GIT_PROMPT_PREFIX=" on ⇄ "
 ZSH_THEME_GIT_PROMPT_DIRTY=" %F{green}±%f"
 ZSH_THEME_GIT_PROMPT_TIMEDOUT=" %F{yellow}?%f"
