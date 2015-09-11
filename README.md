@@ -1,6 +1,6 @@
 # oh-my-zsh-custom
 
-These are Andrew Janke's customizations to go with [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) ("OMZ").
+These are Andrew Janke's customizations to go with [Oh My Zsh](https://github.com/robbyrussell/oh-my-zsh) ("OMZ").
 
 I also have my other dotfiles on GitHub at https://github.com/apjanke/dotfiles, including the `.zshrc` and related config files I use to load and configure Oh My Zsh.
 
@@ -30,7 +30,7 @@ Pending PRs:
 
 Other:
 
-* BSD to GNU LSCOLORS conversion
+* BSD to GNU `LSCOLORS` conversion
 
 TODO:
 
@@ -49,4 +49,3 @@ andrew@apjanke.net
 
 https://github.com/apjanke
 https://apjanke.net
-
