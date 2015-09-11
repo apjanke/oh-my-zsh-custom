@@ -13,37 +13,40 @@
 # This is designed for a light-on-dark theme
 export LSCOLORS="gxxxdxdxdxexexdxdxgxgx"
 export LS_COLORS=$(omz_lscolors_bsd_to_gnu $LSCOLORS)
+# GNU-specific extras
+LS_COLORS="${LS_COLORS}:ln=00;04"
 # Make completion LS_COLORS consistent with main LS_COLORS
 zstyle -e ':completion:*' list-colors 'reply=${(s.:.)LS_COLORS}'
 
 # The prompt
 
-# Top-level function for dynamic part of prompt
-function build_prompt_front {
-  # Flags indicating status:
-  # - am I root (red #, like bash's root-indicating prompt)
-  print -n '%(#:%F{red}#%f :)'
-  # Display user info, abbreviating default case
-  if [[ "$USER" == $ZSH_DEFAULT_USER ]]; then
-    if [[ -n "$SSH_CLIENT" ]]; then
-      # Default user on remote host: just "@host"
-      print -n "%F{blue}@%m%f "
-    fi
-    # Default user on local host: show nothing
-  else
-    # Otherwise, show "user@host"
-    print -n "%F{blue}%n@%m%f "
-  fi
-}
+() {
 
+# Flags indicating status:
+# - am I root (red #, like bash's root-indicating prompt)
+local first_bit='%(#:%F{red}#%f :)'
+# User info, abbreviating default case
+if [[ "$USER" == $ZSH_DEFAULT_USER ]]; then
+  if [[ -n "$SSH_CLIENT" ]]; then
+    # Default user on remote host: just "@host"
+    first_bit+="%F{blue}@%m%f "
+  fi
+  # Default user on local host: show nothing
+else
+  # Otherwise, "user@host"
+  first_bit+="%F{blue}%n@%m%f "
+fi
+first_bit+='%F{cyan}%~%f'
 # - was there an error (bright ✘)
+local line2='%(?::%F{yellow}✘%f )'
+
 if [[ $OSTYPE == cygwin ]]; then
   # Skip git info on Windows because it is too slow
-  PROMPT="[$(build_prompt_front)%F{cyan}%~%f]
-%(?::%F{yellow}✘%f )$ "
+  PROMPT="[$first_bit]
+$line2\$ "
 else
-  PROMPT="[$(build_prompt_front)%F{cyan}%~%f\$(git_prompt_info)]
-%(?::%F{yellow}✘%f )$ "
+  PROMPT="[$first_bit\$(git_prompt_info)]
+$line2\$ "
 fi
 
 # VCS indicator styling for OMZ
@@ -54,20 +57,5 @@ ZSH_THEME_GIT_PROMPT_UNTRACKED=" %F{green}?%f"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
 ZSH_THEME_GIT_PROMPT_SUFFIX=""
 
-ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE='(ahr)'
-ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE='(bhr)'
-ZSH_THEME_GIT_PROMPT_DIVERGED_REMOTE='(dvr)'
-ZSH_THEME_GIT_PROMPT_AHEAD='(ah)'
-ZSH_THEME_GIT_PROMPT_BEHIND='(bh)'
-ZSH_THEME_GIT_PROMPT_DIVERGED='V'
-ZSH_THEME_GIT_PROMPT_SHA_BEFORE='['
-ZSH_THEME_GIT_PROMPT_SHA_AFTER=']'
-ZSH_THEME_GIT_PROMPT_ADDED='A'
-ZSH_THEME_GIT_PROMPT_MODIFIED='M'
-ZSH_THEME_GIT_PROMPT_RENAMED='R'
-ZSH_THEME_GIT_PROMPT_DELETED='D'
-ZSH_THEME_GIT_PROMPT_STASHED='(stash)'
-ZSH_THEME_GIT_PROMPT_UNMERGED='U'
-ZSH_THEME_GIT_PROMPT_UNTRACKED='+'
-
+}
 

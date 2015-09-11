@@ -8,13 +8,13 @@ This includes:
 * My themes
 * Alternate versions of things for testing
 
-This is hosted on GitHub so other people working on oh-my-zsh can look at it when testing code, and so I can easily sync it to multiple machines of mine. This is not intended to provide significant functionality or reusable code of value. You probably do not want to use this as your own OMZ custom dir unless you're working an OMZ issue with me.
+This is hosted on GitHub so other people working on OMZ can look at it when testing code, and so I can easily sync it to multiple machines of mine. This is not intended to provide significant functionality or reusable code of value. You probably do not want to use this as your own OMZ custom dir unless you're working an OMZ issue with me.
 
 No support of any kind is provided for this code.
 
 ## Stuff currently included
 
-Code from these pending PRs is currently in here:
+Pending PRs:
 
 * Timebox git status calls
  * https://github.com/robbyrussell/oh-my-zsh/pull/3914
@@ -25,6 +25,10 @@ Code from these pending PRs is currently in here:
   * https://github.com/robbyrussell/oh-my-zsh/pull/3940
 * A bit of stuff (but not the majority) from theme support unification
   * https://github.com/robbyrussell/oh-my-zsh/pull/3743
+
+Other:
+
+* BSD to GNU LSCOLORS conversion
 
 TODO:
 
@@ -39,6 +43,8 @@ By convention, I clone this locally to `~/.oh-my-zsh-custom`, but any location w
 
 Andrew Janke
 
-janke@pobox.com
+andrew@apjanke.net
 
 https://github.com/apjanke
+https://apjanke.net
+
