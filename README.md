@@ -2,7 +2,9 @@
 
 These are Andrew Janke's customizations to go with [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) ("OMZ").
 
-This includes:
+I also have my other dotfiles on GitHub at https://github.com/apjanke/dotfiles, including the `.zshrc` and related config files I use to load and configure Oh My Zsh.
+
+This OMZ custom dir includes:
 
 * Stuff in pending Pull Requests for the main OMZ but I want active now
 * My themes
