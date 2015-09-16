@@ -28,7 +28,7 @@ zstyle -e ':completion:*' list-colors 'reply=${(s.:.)LS_COLORS}'
 # Flags indicating status:
 # - was there an error (bright ✘)
 # - am I root (red #, like bash's root-indicating prompt)
-local first_bit='%(?::%F{yellow}✘%?%f )%(#:%F{red}#%f :)'
+local first_bit='%(?::%F{yellow}✘%f )%(#:%F{red}#%f :)'
 # User info, abbreviating default case
 if [[ "$USER" == $ZSH_DEFAULT_USER ]]; then
   if [[ -n "$SSH_CLIENT" ]]; then
