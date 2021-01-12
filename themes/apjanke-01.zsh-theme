@@ -30,7 +30,7 @@ zstyle -e ':completion:*' list-colors 'reply=${(s.:.)LS_COLORS}'
 # - am I root (red #, like bash's root-indicating prompt)
 local first_bit='%(?::%F{yellow}✘%f )%(#:%F{red}#%f :)'
 # User info, abbreviating default case
-if [[ "$USER" == $ZSH_DEFAULT_USER ]]; then
+if [[ " ${ZSH_DEFAULT_USERS[@]} " =~ " $USER " ]]; then
   if [[ -n "$SSH_CLIENT" ]]; then
     # Default user on remote host: just "@host"
     first_bit+="%F{blue}@%m%f "
